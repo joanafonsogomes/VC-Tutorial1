@@ -1,25 +1,20 @@
 function [noise,smooth] = main_smoothfilters(imagem,ruido,paramRuido,dominioFiltro, tipoSmoothing, paramFiltro)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
+noise = applyRuido(imagem,ruido,paramRuido);
+%smooth = filtroSpatial(noise,tipoSmoothing,paramFiltro);
 switch dominioFiltro
     case 'spatial' 
-        
-        switch tipoSmoothing
-            case 'average'
-                h = fspecial('average',paramFiltro(1));
-                smooth = imfilter(noise,h);
-            case 'gaussian'
-                h = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
-                smooth = imfilter(noise,h);            
-            case 'median'
-                smooth = medfilt2(noise,[paramFiltro(1) paramFiltro(1)]);
-            otherwise
-            error(strcat(('Tipo de smoothing inválido. Opções: '),('average, gaussian, median')));
-        end   
-        
-     case 'frequency'
-         
+        smooth = filtroSpatial(noise,tipoSmoothing,paramFiltro);
+    case 'frequency'
+        smooth = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro);
+    otherwise
+        error(strcat(('Domínio de filtro inválido. Opções: '),('spatial, frequency')));
+end
+figure
+
+end
+
+%{
          switch tipoSmoothing
              case 'butterworth'
                  h = butterworthFilter(paramFiltro(1),paramFiltro(2),paramFiltro(3));
@@ -28,14 +23,11 @@ switch dominioFiltro
           otherwise
             error(strcat(('Tipo de smoothing inválido. Opções: '),('butterworth, gaussian')));
          end
-otherwise
-   error(strcat(('Domínio de filtro inválidpo. Opções: '),('spatial, frequency')));
-end
-end
-
+         %}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [noise] = applyNoise(  );
+%aplicar ruido a imagem
+function [noise] = applyRuido(imagem,ruido,paramRuido)
 
 switch ruido
     case 'salt & pepper'
@@ -46,9 +38,55 @@ switch ruido
      
     otherwise
         error(strcat('Ruído inválido. Opções: '),('salt & pepper, gaussian'));
-      
+ 
 end
 
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%fazer smothing com filtro espacial
+function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
+
+    switch tipoSmoothing
+            case 'average'
+                h = fspecial('average',paramFiltro(1));
+                smooth = imfilter(noise,h);
+            case 'gaussian'
+                h = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
+                smooth = imfilter(noise,h);            
+            case 'median'
+                smooth = medfilt2(noise,[paramFiltro(1) paramFiltro(2)]);
+        otherwise
+                error(strcat(('Tipo de smoothing inválido. Opções: '),('butterworth, gaussian')));
+    end   
+
+
+
+end
+
+%{
+function[] = dft(imagem)
+
+
+end
+
+function[] = compare_dft(imagem)
+
+
+end
+
+
+function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
+  
+
+    switch tipoSmoothing
+        case 'gaussian'     
+            smooth = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
+        case 'butterworth'
+            smooth = butterworthFilter(paramFiltro(1),paramFiltro(2),paramFiltro(3));
+        otherwise
+            error(strcat(('Tipo de smoothing inválido. Opções: '),('average, gaussian, median')));
+    end   
+
+end
 

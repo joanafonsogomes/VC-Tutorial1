@@ -1,14 +1,14 @@
-original = 'baboon';
-ficheiro = 'baboon.png';
+original = 'qr';
+ficheiro = 'qr.jpg';
 
-ruido = 'salt & pepper';
+ruido = 'gaussian';
 paramRuido = [0.2,0.02];
 %Para salt & pepper usar o primeiro valor
 %para gaussian 1º valor para a média e o 2º para a variância
 
 dominioFiltro = 'frequency';
 tipoSmoothing = 'butterworth';
-paramFiltro = [512,2,10];
+paramFiltro = [512,5,40];
 %Para dominioFiltro spacial:
 %average - Usado apenas o primeiro valores para definir o tamanho da matriz
 %gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma

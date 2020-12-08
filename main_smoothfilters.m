@@ -10,7 +10,7 @@ switch dominioFiltro
     otherwise
         error(strcat(('Domínio de filtro inválido. Opções: '),('spatial, frequency')));
 end
-compare_dft(imagem,noise)
+compare_dft(imagem,noise, smooth)
 
 end
 
@@ -54,31 +54,33 @@ function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
 
 end
 
-function resultado = idft(imagem, paramFiltro)
+function resultado = idft(imagem)
     imgsemDFT = ifft2(imagem); %aplicar DFT
-    
-    
-    imreal = abs(imgsemDFT);
-    
-    for i=1:(size(imagem)/2)
-        for j=1:(size(imagem)/2)
-            resultado(i,j)= imreal(i,j);
+   
+    for i=1:size(imagem)
+        for j=1:size(imagem)
+            imreal(i,j)=imgsemDFT(i,j)*((-1)^(i+j));
         end
     end
     
-    resultado = uint8(resultado);
+    
+ 
+   resultado=imreal(size(imreal)/4 +1:size(imreal)*3/4, size(imreal)/4 +1:size(imreal)*3/4);
+
+   resultado =mat2gray(real(resultado));
     
 end
 
 function [imgDFTCentrada,resultado] = dft(imagem, paramFiltro)
     size = paramFiltro(1)./2; %metade do tamanho do kernel
+    
     padding = padarray(imagem,[size size],0,'both');
-    imgComDFT = abs(fft2(padding)); %aplicar DFT
+    imgComDFT = (fft2(padding)); %aplicar DFT
     imgDFTCentrada = fftshift(imgComDFT);
-    resultado = mat2gray(imgDFTCentrada)*255;
+    resultado = mat2gray(log(abs(imgDFTCentrada)+1));
 end
 
-function[] = compare_dft(imagem,noise)
+function[] = compare_dft(imagem,noise,smooth)
     figure;
     subplot(3,2,1),imshow(imagem);
     [A,B] = dft(imagem,512);
@@ -86,8 +88,9 @@ function[] = compare_dft(imagem,noise)
     [C,D] = dft(noise,512);
     subplot(3,2,3),imshow(noise);
     subplot(3,2,4),imshow(D);
-    subplot(3,2,5),imshow(imagem);
-    subplot(3,2,6),imshow(idft(A,512));
+    subplot(3,2,5),imshow(smooth);
+    [F,G]= dft(smooth,512);
+    subplot(3,2,6),imshow(G);
 end
 
 function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
@@ -97,17 +100,37 @@ function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
         case 'gaussian'     
             % criar o filtro
             h = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
+            
         case 'butterworth'
             h = butterworth(paramFiltro(1),paramFiltro(2),paramFiltro(3));
+           
         otherwise
             error(strcat(('Tipo de smoothing inválido. Opções: '),('average, gaussian, median')));      
     end   
     
-    [h, etc] = dft(h, 2*size(imagem)-size(h));
-    [f, etc] = dft(imagem, size(imagem));
-    g = h .* f;
-    figure; imshow(mat2gray(g)*255);
-    smooth = idft(g,size(imagem));
+    
+    hh = padarray(h,[256 256],0,'both');
+    [f, etcf] = dft(noise, size(noise));
+    g = hh .* f;
+    
+   
+[trr, tr2] = dft(imagem, size(imagem));
+    
+    smooth = idft(g);
+    figure;
+    subplot(3,2,1);imshow(noise)
+    subplot(3,2,2);plot(etcf);
+    subplot(3,2,3);imshow(smooth)
+    subplot(3,2,4);plot(mat2gray(log(abs(g)+1)));
+    subplot(3,2,5);imshow(imagem)
+    subplot(3,2,6);plot(abs(tr2));
+    figure;
+    subplot(1,2,1);
+    imshow(snrr(im2double(imagem),im2double(noise)));
+    subplot(1,2,2);
+    imshow(snrr(im2double(imagem),smooth));
+    
+   
 end
 
 function h = butterworth(size,n,d0)

@@ -2,19 +2,20 @@ original = 'baboon';
 ficheiro = 'baboon.png';
 
 ruido = 'salt & pepper';
-paramRuido = [0.02,0.02];
+paramRuido = [0.2,0.02];
 %Para salt & pepper usar o primeiro valor
 %para gaussian 1º valor para a média e o 2º para a variância
 
-dominioFiltro = 'spatial';
-tipoSmoothing = 'median';
-paramFiltro = [100,100,0];
+dominioFiltro = 'frequency';
+tipoSmoothing = 'butterworth';
+paramFiltro = [512,2,10];
 %Para dominioFiltro spacial:
 %average - Usado apenas o primeiro valores para definir o tamanho da matriz
 %gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma
 %median - Usado o primeiro valor para o numero de colunas da matriz e o segundo para as linhas
 %Para frequencia:
-
+%gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma
+%butterworth - Primeiro valor para o tamanho , segundo para o n e o 3º para o D0
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,6 +36,13 @@ switch dominioFiltro
                 output = strcat(original,'_',dominioFiltro,'_',tipoSmoothing,'_',num2str(paramFiltro(1)),'_',num2str(paramFiltro(2)),'.png');
         end
     case 'frequency'
+        switch tipoSmoothing
+            case 'gaussian'
+                output = strcat(original,'_',dominioFiltro,'_',tipoSmoothing,'_',num2str(paramFiltro(1)),'_',num2str(paramFiltro(2)),'.png');
+            case 'butterworth'
+                output = strcat(original,'_',dominioFiltro,'_',tipoSmoothing,'_',num2str(paramFiltro(1)),'_',num2str(paramFiltro(2)),'_',num2str(paramFiltro(3)),'.png');
+        end
+        
 end
   
 imwrite(smooth,output);

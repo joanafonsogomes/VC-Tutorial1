@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%  Paramêtros gerais para a execução dos programas  %%%%%%%%%%%%
+%%%%%%%%%%%%                 Inputs do utilizador              %%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 prompt = 'Caminho para a imagem: ';
 ficheiro = input(prompt,'s');
@@ -23,9 +23,6 @@ else
     end
     
 end
-%paramRuido = [0.2,0.02];
-%Para salt & pepper usar o primeiro valor
-%para gaussian 1º valor para a média e o 2º para a variância
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 prompt = '\n\nDominio do filtro ( spatial | frequency ): ';
 dominioFiltro = input(prompt,'s');
@@ -73,15 +70,6 @@ switch dominioFiltro
     otherwise 
         error('Tipo de filtro inválido.');
 end
-%paramFiltro = [512,5,40];
-%Para dominioFiltro spacial:
-%average - Usado apenas o primeiro valores para definir o tamanho da matriz
-%gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma
-%median - Usado o primeiro valor para o numero de colunas da matriz e o segundo para as linhas
-%Para frequencia:
-%gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma
-%butterworth - Primeiro valor para o tamanho , segundo para o n e o 3º para o D0
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%      Leitura da imagem e aplicação do respetivo noise e filtro      %%%

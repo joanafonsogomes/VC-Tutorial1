@@ -79,23 +79,12 @@ function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
     [f, etcf] = dft(noise, size(noise));
     g = hh .* f;
     
-   
-[trr, tr2] = dft(imagem, size(imagem));
+   [trr, tr2] = dft(imagem, size(imagem));
     
     smooth = idft(g);
-    figure;
-    subplot(3,2,1);imshow(noise)
-    subplot(3,2,2);plot(etcf);
-    subplot(3,2,3);imshow(smooth)
-    subplot(3,2,4);plot(mat2gray(log(abs(g)+1)));
-    subplot(3,2,5);imshow(imagem)
-    subplot(3,2,6);plot(abs(tr2));
-    figure;
-    subplot(1,2,1);
-    imshow(snrr(im2double(imagem),im2double(noise)));
-    subplot(1,2,2);
-    imshow(snrr(im2double(imagem),smooth));
     
+    compare_snr(imagem,noise,smooth);
+    compare_spectres(imagem,noise,smooth,etcf,g,tr2);
    
 end
 
@@ -157,15 +146,61 @@ end
 %%%                 original, com ruido e com o filtro                  %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function[] = compare_dft(imagem,noise,smooth)
-    figure;
+    figure('Name','Comparação do DFT entre a imagem original, com ruido e a imagem com o filtro','NumberTitle','off');
     subplot(3,2,1),imshow(imagem);
     [A,B] = dft(imagem,512);
     subplot(3,2,2),imshow(B);
+    title('Imagem original')
     [C,D] = dft(noise,512);
     subplot(3,2,3),imshow(noise);
     subplot(3,2,4),imshow(D);
+    title('Imagem com ruído')
     subplot(3,2,5),imshow(smooth);
     [F,G]= dft(smooth,512);
     subplot(3,2,6),imshow(G);
+    title('Imagem com filtro')
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%             Função para comparação do espectro da imagem            %%%
+%%%                 original, com ruido e com o filtro                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function[] = compare_spectres(imagem,noise,smooth,etcf,g,tr2)
+    figure('Name','Comparação do espectro entre a imagem original, com ruido e a imagem com o filtro','NumberTitle','off');
+    subplot(3,2,1);imshow(imagem);
+    subplot(3,2,2);plot(abs(tr2));
+    title('Imagem original')
+    subplot(3,2,3);imshow(noise);
+    subplot(3,2,4);plot(etcf);
+    title('Imagem com ruído')
+    subplot(3,2,5);imshow(smooth);
+    subplot(3,2,6);plot(mat2gray(log(abs(g)+1)));
+    title('Imagem com filtro')
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%             Função para calcular o snr de uma imagem                %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function snr =  snrr(img,noise)
+if (size(img)~= size(noise)) 
+    throw error;
+end
+sr = imdivide(img,noise);
+snr = 10 .* log10(im2double(sr));
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%               Função para comparação do ruido da imagem             %%%
+%%%                       com ruido e com o filtro                      %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function[] = compare_snr(imagem,noise,smooth)
+    figure('Name','Comparação do ruido entre a imagem com ruido e a imagem com o filtro','NumberTitle','off');
+    subplot(1,2,1);
+    imshow(snrr(im2double(imagem),im2double(noise)));
+    title('Imagem com ruido')
+    subplot(1,2,2);
+    imshow(snrr(im2double(imagem),smooth));
+    title('Imagem com filtro')
 end
 

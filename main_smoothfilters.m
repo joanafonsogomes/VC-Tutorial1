@@ -1,7 +1,9 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%                               MAIN                                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [noise,smooth] = main_smoothfilters(imagem,ruido,paramRuido,dominioFiltro, tipoSmoothing, paramFiltro)
 
 noise = applyRuido(imagem,ruido,paramRuido);
-%smooth = filtroSpatial(noise,tipoSmoothing,paramFiltro);
 switch dominioFiltro
     case 'spatial' 
         smooth = filtroSpatial(noise,tipoSmoothing,paramFiltro);
@@ -14,9 +16,9 @@ compare_dft(imagem,noise, smooth)
 
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%aplicar ruido a imagem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%                Função para aplicar ruido à imagem                   %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [noise] = applyRuido(imagem,ruido,paramRuido)
 
 switch ruido
@@ -28,13 +30,13 @@ switch ruido
      
     otherwise
         error(strcat('Ruído inválido. Opções: '),('salt & pepper, gaussian'));
- 
 end
 
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%fazer smothing com filtro espacial
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%         Função para aplicar smoothing com filtro espacial           %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
 
     switch tipoSmoothing
@@ -54,45 +56,9 @@ function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
 
 end
 
-function resultado = idft(imagem)
-    imgsemDFT = ifft2(imagem); %aplicar DFT
-   
-    for i=1:size(imagem)
-        for j=1:size(imagem)
-            imreal(i,j)=imgsemDFT(i,j)*((-1)^(i+j));
-        end
-    end
-    
-    
- 
-   resultado=imreal(size(imreal)/4 +1:size(imreal)*3/4, size(imreal)/4 +1:size(imreal)*3/4);
-
-   resultado =mat2gray(real(resultado));
-    
-end
-
-function [imgDFTCentrada,resultado] = dft(imagem, paramFiltro)
-    size = paramFiltro(1)./2; %metade do tamanho do kernel
-    
-    padding = padarray(imagem,[size size],0,'both');
-    imgComDFT = (fft2(padding)); %aplicar DFT
-    imgDFTCentrada = fftshift(imgComDFT);
-    resultado = mat2gray(log(abs(imgDFTCentrada)+1));
-end
-
-function[] = compare_dft(imagem,noise,smooth)
-    figure;
-    subplot(3,2,1),imshow(imagem);
-    [A,B] = dft(imagem,512);
-    subplot(3,2,2),imshow(B);
-    [C,D] = dft(noise,512);
-    subplot(3,2,3),imshow(noise);
-    subplot(3,2,4),imshow(D);
-    subplot(3,2,5),imshow(smooth);
-    [F,G]= dft(smooth,512);
-    subplot(3,2,6),imshow(G);
-end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Função para aplicar smoothing com filtro no domínio das frequências %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
   
 
@@ -133,6 +99,9 @@ function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
    
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%             Função para calcular o filtro Butterworth               %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function h = butterworth(size,n,d0)
     h = zeros(size, size);
     m = (size + 1)/2;
@@ -149,3 +118,54 @@ function h = butterworth(size,n,d0)
     end
     h = h ./ t;
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%                Função para aplicar DFT numa imagem.                 %%%
+%%%   Retorna a imagem com dft e uma imagem já pronta para vizualizar   %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [imgDFTCentrada,resultado] = dft(imagem, paramFiltro)
+    size = paramFiltro(1)./2; %metade do tamanho do kernel
+    
+    padding = padarray(imagem,[size size],0,'both');
+    imgComDFT = (fft2(padding)); %aplicar DFT
+    imgDFTCentrada = fftshift(imgComDFT);
+    resultado = mat2gray(log(abs(imgDFTCentrada)+1));
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%           Função para aplicar a inversa DFT numa imagem             %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function resultado = idft(imagem)
+    imgsemDFT = ifft2(imagem); %aplicar DFT
+   
+    for i=1:size(imagem)
+        for j=1:size(imagem)
+            imreal(i,j)=imgsemDFT(i,j)*((-1)^(i+j));
+        end
+    end
+    
+    
+ 
+   resultado=imreal(size(imreal)/4 +1:size(imreal)*3/4, size(imreal)/4 +1:size(imreal)*3/4);
+
+   resultado =mat2gray(real(resultado));
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%             Função para comparação da DFT da imagem                 %%%
+%%%                 original, com ruido e com o filtro                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function[] = compare_dft(imagem,noise,smooth)
+    figure;
+    subplot(3,2,1),imshow(imagem);
+    [A,B] = dft(imagem,512);
+    subplot(3,2,2),imshow(B);
+    [C,D] = dft(noise,512);
+    subplot(3,2,3),imshow(noise);
+    subplot(3,2,4),imshow(D);
+    subplot(3,2,5),imshow(smooth);
+    [F,G]= dft(smooth,512);
+    subplot(3,2,6),imshow(G);
+end
+

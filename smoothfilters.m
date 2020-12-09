@@ -1,11 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%  Paramêtros gerais para a execução dos programas  %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 original = 'qr';
 ficheiro = 'qr.jpg';
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ruido = 'gaussian';
 paramRuido = [0.2,0.02];
 %Para salt & pepper usar o primeiro valor
 %para gaussian 1º valor para a média e o 2º para a variância
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dominioFiltro = 'frequency';
 tipoSmoothing = 'butterworth';
 paramFiltro = [512,5,40];
@@ -18,13 +21,29 @@ paramFiltro = [512,5,40];
 %butterworth - Primeiro valor para o tamanho , segundo para o n e o 3º para o D0
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%      Leitura da imagem e aplicação do respetivo noise e filtro      %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 imagem = rgb2gray(imread(ficheiro));
-%imagem = double(imagem);%/255;
 [noise,smooth] = main_smoothfilters(imagem,ruido,paramRuido,dominioFiltro, tipoSmoothing, paramFiltro);
 
-output = 'error';
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%   Escrita da Imagem com Ruído    %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if(strcmp(ruido,'salt & pepper'))
+    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'.png');
+else
+    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'_',num2str(paramRuido(2)),'_','.png');
+end
+
+imwrite(noise,output);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%Escrita da imagem com o filtro da frequencia%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+output = 'error.png';
 switch dominioFiltro
     case 'spatial'
         switch tipoSmoothing
@@ -47,14 +66,5 @@ end
   
 imwrite(smooth,output);
 
-if(strcmp(ruido,'salt & pepper'))
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'.png');
-else
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'_',num2str(paramRuido(2)),'_','.png');
-end
-
-imwrite(noise,output);
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,17 +1,79 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%  Paramêtros gerais para a execução dos programas  %%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-original = 'qr';
-ficheiro = 'qr.jpg';
+prompt = 'Caminho para a imagem: ';
+ficheiro = input(prompt,'s');
+original =  split(ficheiro,'.');
+original = string(original(1));
+imread(ficheiro);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ruido = 'gaussian';
-paramRuido = [0.2,0.02];
+prompt = '\n\nTipo de ruído a aplicar ( gaussian | salt & pepper ): ';
+ruido = input(prompt,'s');
+if strcmp(ruido,'gaussian')
+    prompt = 'Média: ';
+    paramRuido(1) = input(prompt);
+    prompt = 'Variância: ';
+    paramRuido(2) = input(prompt);
+else
+    if strcmp(ruido,'salt & pepper')
+        prompt = 'Densidade: ';
+        paramRuido = input(prompt);
+    else
+        error('Tipo de ruído inválido.');
+    end
+    
+end
+%paramRuido = [0.2,0.02];
 %Para salt & pepper usar o primeiro valor
 %para gaussian 1º valor para a média e o 2º para a variância
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dominioFiltro = 'frequency';
-tipoSmoothing = 'butterworth';
-paramFiltro = [512,5,40];
+prompt = '\n\nDominio do filtro ( spatial | frequency ): ';
+dominioFiltro = input(prompt,'s');
+
+switch dominioFiltro
+    case 'spatial'
+        prompt = 'Tipo ( average | gaussian | median ): ';
+        tipoSmoothing = input(prompt,'s');
+        switch tipoSmoothing
+            case 'average'
+                prompt = 'Hsize: ';
+                paramFiltro(1) = input(prompt);
+            case 'gaussian'
+                prompt = 'Hsize: ';
+                paramFiltro(1) = input(prompt);
+                prompt = 'Sigma: ';
+                paramFiltro(2) = input(prompt);
+            case 'median'
+                prompt = 'Hsize(MxN)\nM: ';
+                paramFiltro(1) = input(prompt);
+                prompt = 'N: ';
+                paramFiltro(2) = input(prompt);
+            otherwise
+                error('Tipo de Smoothing inválido.');
+        end
+    case 'frequency'
+        prompt = 'Frequência ( gaussian | butterworth ): ';
+        tipoSmoothing = input(prompt,'s');
+        switch tipoSmoothing
+            case 'gaussian'
+                prompt = 'Hsize: ';
+                paramFiltro(1) = input(prompt);
+                prompt = 'Sigma: ';
+                paramFiltro(2) = input(prompt);
+            case 'butterworth'
+                prompt = 'Hsize: ';
+                paramFiltro(1) = input(prompt);
+                prompt = 'n: ';
+                paramFiltro(2) = input(prompt);
+                prompt = 'D0: ';
+                paramFiltro(3) = input(prompt);
+            otherwise
+                error('Tipo de smoothing inválido.');
+        end
+    otherwise 
+        error('Tipo de filtro inválido.');
+end
+%paramFiltro = [512,5,40];
 %Para dominioFiltro spacial:
 %average - Usado apenas o primeiro valores para definir o tamanho da matriz
 %gaussian - Usado o primeiro valor para o tamanho da matriz, e o segundo valor para o sigma
@@ -26,6 +88,7 @@ paramFiltro = [512,5,40];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 imagem = rgb2gray(imread(ficheiro));
+imwrite(imagem, strcat(original,'_gray','.png'));
 [noise,smooth] = main_smoothfilters(imagem,ruido,paramRuido,dominioFiltro, tipoSmoothing, paramFiltro);
 
 

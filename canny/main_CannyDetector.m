@@ -1,7 +1,21 @@
-function [outputArg1,outputArg2] = main_CannyDetector(inputArg1,inputArg2)
-%MAIN_CANNYDETECTOR Summary of this function goes here
-%   Detailed explanation goes here
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+function canny = main_CannyDetector(imagem,kernel,sigma,thresholdmin,thresholdmax)
+
+gaussian = gaussian_smoothing(imagem,kernel,sigma);
+
+[magnitude,direcao] = gradient(imagem);
+
+improved_image = nonmax(direcao,magnitude);
+
+[strongedges,weakedges] = double_threshold(improved_image,thresholdmin,thresholdmax);
+
+edgemap = hysteresis_thresholding2(strongedges,weakedges);
+
+
+figure;
+imshow(strongedges);
+figure;
+imshow(weakedges);
+figure;
+imshow(edgemap);
 end
 

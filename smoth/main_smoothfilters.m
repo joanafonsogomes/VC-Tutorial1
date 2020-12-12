@@ -28,9 +28,10 @@ switch ruido
         noise=imagem;                       %alloc
         for i=1:size(imagem)
             for j=1:size(imagem)
-                if(rndmxpcnt(i,j)>= 1-paramRuido)   % add noise if threshold (1-paramRuido) > randmvalue
+                if(rndmxpcnt(i,j)>= 1-paramRuido)  
+                     % add noise if threshold (1-paramRuido) > randmvalue
                     if(worb(i,j)>0.5)       
-                        noise(i,j)= 256;    % 50% white
+                        noise(i,j)= 255;    % 50% white
                     else
                         noise(i,j)= 0;      % 50% black
                     end
@@ -38,8 +39,8 @@ switch ruido
             end
         end
     case 'gaussian'
-        gauss=randn(size(imagem)).*(paramRuido*256);
-        noise=uint8(mat2gray(double(imagem)+gauss).*256);
+        gauss=randn(size(imagem)).*(paramRuido*255);
+        noise=uint8(mat2gray(double(imagem)+gauss).*255);
     otherwise
         error(strcat('Ruído inválido. Opções: '),('salt & pepper, gaussian'));
 end
@@ -60,7 +61,7 @@ function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
                 smooth = filterCorrelation(noise,filter);            
             case 'median'
                     imgSz=size(noise);ks=paramFiltro(1);
-                    padthicc=ceil((ks-1)/2)
+                    padthicc=ceil((ks-1)/2);
                     p = padarray(noise,[padthicc padthicc],0,'both'); %img w/ padding
     
                 for i=1:size(noise)

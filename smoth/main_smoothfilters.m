@@ -38,7 +38,7 @@ switch ruido
             end
         end
     case 'gaussian'
-        gauss=randn(size(imagem)).*paramRuido;
+        gauss=randn(size(imagem)).*(paramRuido*256);
         noise=uint8(mat2gray(double(imagem)+gauss).*256);
     otherwise
         error(strcat('Ruído inválido. Opções: '),('salt & pepper, gaussian'));

@@ -81,12 +81,7 @@ imwrite(imagem, strcat(original,'_gray','.png'));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%   Escrita da Imagem com Ruído    %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if(strcmp(ruido,'salt & pepper'))
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido),'.png');
-else
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido)','.png');
-end
-
+output = strcat(original,'_',ruido,'_',num2str(paramRuido),'.png');
 imwrite(noise,output);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

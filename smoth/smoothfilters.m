@@ -10,10 +10,8 @@ imread(ficheiro);
 prompt = '\n\nTipo de ruído a aplicar ( gaussian | salt & pepper ): ';
 ruido = input(prompt,'s');
 if strcmp(ruido,'gaussian')
-    prompt = 'Média: ';
-    paramRuido(1) = input(prompt);
     prompt = 'Variância: ';
-    paramRuido(2) = input(prompt);
+    paramRuido = input(prompt);
 else
     if strcmp(ruido,'salt & pepper')
         prompt = 'Densidade: ';
@@ -84,9 +82,9 @@ imwrite(imagem, strcat(original,'_gray','.png'));
 %%%%%%%%%%%%%%%%%%%%   Escrita da Imagem com Ruído    %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(strcmp(ruido,'salt & pepper'))
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'.png');
+    output = strcat(original,'_',ruido,'_',num2str(paramRuido),'.png');
 else
-    output = strcat(original,'_',ruido,'_',num2str(paramRuido(1)),'_',num2str(paramRuido(2)),'_','.png');
+    output = strcat(original,'_',ruido,'_',num2str(paramRuido)','.png');
 end
 
 imwrite(noise,output);

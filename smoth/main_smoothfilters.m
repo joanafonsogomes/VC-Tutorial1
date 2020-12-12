@@ -23,11 +23,23 @@ function [noise] = applyRuido(imagem,ruido,paramRuido)
 
 switch ruido
     case 'salt & pepper'
-        noise = imnoise(imagem,ruido,paramRuido(1));
-    
+        rndmxpcnt=rand(size(imagem));
+        worb=rand(size(imagem));            
+        noise=imagem;                       %alloc
+        for i=1:size(imagem)
+            for j=1:size(imagem)
+                if(rndmxpcnt(i,j)>= 1-paramRuido)   % add noise if threshold (1-paramRuido) > randmvalue
+                    if(worb(i,j)>0.5)       
+                        noise(i,j)= 256;    % 50% white
+                    else
+                        noise(i,j)= 0;      % 50% black
+                    end
+                end
+            end
+        end
     case 'gaussian'
-        noise = imnoise(imagem,ruido,paramRuido(1),paramRuido(2));
-     
+        gauss=randn(size(imagem)).*paramRuido;
+        noise=uint8(mat2gray(double(imagem)+gauss).*256);
     otherwise
         error(strcat('Ruído inválido. Opções: '),('salt & pepper, gaussian'));
 end
@@ -40,14 +52,25 @@ end
 function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
 
     switch tipoSmoothing
-            case 'average'
-                h = fspecial('average',paramFiltro(1));
-                smooth = imfilter(noise,h);
+            case 'average'                          
+                h = ones(paramFiltro(1))./(paramFiltro(1)^2);       
+                smooth = filterCorrelation(noise,h);
             case 'gaussian'
-                h = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
-                smooth = imfilter(noise,h);            
+                filter= gaussKern(paramFiltro);
+                smooth = filterCorrelation(noise,filter);            
             case 'median'
-                smooth = medfilt2(noise,[paramFiltro(1) paramFiltro(2)]);
+                    imgSz=size(noise);ks=paramFiltro(1);
+                    padthicc=ceil((ks-1)/2)
+                    p = padarray(noise,[padthicc padthicc],0,'both'); %img w/ padding
+    
+                for i=1:size(noise)
+                    for j=1:size(noise)
+                        filter=p(i:i+(ks-1),j:j+(ks-1));     %get neighbors
+                        smooth(i,j)=median(filter,'all');    % matrix median
+                    end
+                end
+                
+                
         otherwise
                 error(strcat(('Tipo de smoothing inválido. Opções: '),('butterworth, gaussian')));
     end   
@@ -65,8 +88,7 @@ function[smooth] = filtroFrequency(imagem,noise,tipoSmoothing,paramFiltro)
     switch tipoSmoothing
         case 'gaussian'     
             % criar o filtro
-            h = fspecial('gaussian',paramFiltro(1),paramFiltro(2));
-            
+            h= gaussKern(paramFiltro);
         case 'butterworth'
             h = butterworth(paramFiltro(1),paramFiltro(2),paramFiltro(3));
            

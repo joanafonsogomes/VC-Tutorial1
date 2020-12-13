@@ -1,7 +1,7 @@
-function new_img = gaussian_smoothing(imagem,size,sigma)
+function gaussian = gaussian_smoothing(imagem,size,sigma)
 
 g = fspecial('gaussian',size,sigma);   
-new_img = imfilter(imagem,g);
+gaussian = imfilter(imagem,g);
 
 end
 

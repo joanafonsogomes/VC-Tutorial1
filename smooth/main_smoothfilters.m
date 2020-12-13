@@ -23,17 +23,17 @@ function [noise] = applyRuido(imagem,ruido,paramRuido)
 
 switch ruido
     case 'salt & pepper'
-        rndmxpcnt=rand(size(imagem));
-        worb=rand(size(imagem));            
-        noise=imagem;                       %alloc
+        rndmxpcnt = rand(size(imagem));
+        worb = rand(size(imagem));            
+        noise = imagem;                       %alloc
         for i=1:size(imagem)
             for j=1:size(imagem)
-                if(rndmxpcnt(i,j)>= 1-paramRuido)  
+                if(rndmxpcnt(i,j) >= 1-paramRuido)  
                      % add noise if threshold (1-paramRuido) > randmvalue
                     if(worb(i,j)>0.5)       
-                        noise(i,j)= 255;    % 50% white
+                        noise(i,j) = 255;    % 50% white
                     else
-                        noise(i,j)= 0;      % 50% black
+                        noise(i,j) = 0;      % 50% black
                     end
                 end
             end
@@ -66,8 +66,8 @@ function[smooth] = filtroSpatial(noise,tipoSmoothing,paramFiltro)
     
                 for i=1:size(noise)
                     for j=1:size(noise)
-                        filter=p(i:i+(ks-1),j:j+(ks-1));     %get neighbors
-                        smooth(i,j)=median(filter,'all');    % matrix median
+                        filter = p(i:i+(ks-1),j:j+(ks-1));%get neighbors
+                        smooth(i,j) = median(filter,'all');% matrix median
                     end
                 end
                 
@@ -148,19 +148,17 @@ end
 %%%           Função para aplicar a inversa DFT numa imagem             %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function resultado = idft(imagem)
-    imgsemDFT = ifft2(imagem); %aplicar DFT
-   
-    for i=1:size(imagem)
-        for j=1:size(imagem)
-            imreal(i,j)=imgsemDFT(i,j)*((-1)^(i+j));
-        end
-    end
-    
-    
- 
-   resultado=imreal(size(imreal)/4 +1:size(imreal)*3/4, size(imreal)/4 +1:size(imreal)*3/4);
+imgsemDFT = ifft2(imagem); %aplicar DFT
 
-   resultado =mat2gray(real(resultado));
+for i=1:size(imagem)
+    for j=1:size(imagem)
+        imreal(i,j) = imgsemDFT(i,j)*((-1)^(i+j));
+    end
+end
+    
+resultado = imreal(size(imreal)/4 +1:size(imreal)*3/4, size(imreal)/4 +1:size(imreal)*3/4);
+
+resultado = mat2gray(real(resultado));
     
 end
 
@@ -179,7 +177,7 @@ function[] = compare_dft(imagem,noise,smooth)
     subplot(3,2,4),imshow(D);
     title('Imagem com ruído')
     subplot(3,2,5),imshow(smooth);
-    [F,G]= dft(smooth,512);
+    [F,G] = dft(smooth,512);
     subplot(3,2,6),imshow(G);
     title('Imagem com filtro')
 end
@@ -205,7 +203,7 @@ end
 %%%             Função para calcular o snr de uma imagem                %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function snr =  snrr(img,noise)
-if (size(img)~= size(noise)) 
+if (size(img) ~= size(noise)) 
     throw error;
 end
 sr = imdivide(img,noise);

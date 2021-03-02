@@ -1,4 +1,4 @@
-# Tutorial 1
+# VC Tutorial 1
 
 ### Image Filtering and Edge Detection
 
